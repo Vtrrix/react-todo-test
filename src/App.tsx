@@ -1,8 +1,8 @@
 import { useState } from "react";
 import "./index.css";
-import List from "./components/ListItem";
+import ListItem from "./components/ListItem";
 import { useLocalStorage } from "./hooks/useLocalStorage";
-import { listItem } from "./modals/interfaces";
+import { ListItemType } from "./models/interfaces";
 
 export default function App() {
   enum FILTERS {
@@ -12,15 +12,18 @@ export default function App() {
   }
 
   const [list, setList] = useLocalStorage("test", [
-    { val: "test1", check: true, key: 0 },
-    { val: "test2", check: false, key: 1 },
+    { label: "test1", checked: true, id: 0 },
+    { label: "test2", checked: false, id: 1 },
   ]);
   const [inputData, setInputData] = useState("");
   const [filter, setFilter] = useState("all");
 
   const addItem = () => {
     if (inputData) {
-      setList([...list, { val: inputData, check: false, key: Math.random() }]);
+      setList([
+        ...list,
+        { label: inputData, checked: false, id: Math.random() },
+      ]);
       setInputData("");
     }
   };
@@ -34,7 +37,7 @@ export default function App() {
   };
 
   const deleteItem = (id: number) => {
-    var updatedList = list.filter((ele: listItem) => ele.key !== id);
+    var updatedList = list.filter((ele: ListItemType) => ele.id !== id);
     setList(updatedList);
   };
 
@@ -86,40 +89,40 @@ export default function App() {
       </div>
       <div className="list">
         <ul>
-          {list.map((item: listItem) => {
+          {list.map((item: ListItemType) => {
             if (filter === "all") {
               return (
-                <List
+                <ListItem
                   item={item}
-                  id={item.key}
+                  id={item.id}
                   setList={setList}
                   list={list}
-                  deleteItem={deleteItem}
+                  onDeleteItem={deleteItem}
                 />
               );
             }
 
             if (filter === "checked") {
-              return item.check ? (
-                <List
+              return item.checked ? (
+                <ListItem
                   item={item}
-                  id={item.key}
+                  id={item.id}
                   setList={setList}
                   list={list}
-                  deleteItem={deleteItem}
+                  onDeleteItem={deleteItem}
                 />
               ) : (
                 <></>
               );
             }
             if (filter === "unchecked") {
-              return !item.check ? (
-                <List
+              return !item.checked ? (
+                <ListItem
                   item={item}
-                  id={item.key}
+                  id={item.id}
                   setList={setList}
                   list={list}
-                  deleteItem={deleteItem}
+                  onDeleteItem={deleteItem}
                 />
               ) : (
                 <></>

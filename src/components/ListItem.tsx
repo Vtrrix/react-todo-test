@@ -1,29 +1,36 @@
-import { useState } from "react";
-import { listItem } from "../modals/interfaces";
-import { listItemProps } from "../modals/interfaces";
+import { useState, ChangeEvent } from "react";
+import { ListItemType } from "../models/interfaces";
 
-export default function List({
+interface ListItemProps {
+  id: number;
+  setList: (list: ListItemType[]) => {};
+  list: ListItemType[];
+  onDeleteItem: (id: number) => void;
+  item: ListItemType;
+}
+
+export default function ListItem({
   id,
   setList,
   list,
-  deleteItem,
+  onDeleteItem,
   item,
-}: listItemProps) {
+}: ListItemProps) {
   const [editInput, setEditInput] = useState("");
   const [editVisible, setEditVisible] = useState(false);
 
-  const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleEditInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setEditInput(e.target.value);
   };
 
   const updateCheck = () => {
-    var updatedList: listItem[] = [];
+    var updatedList: ListItemType[] = [];
     list.map((ele) => {
-      if (ele.key === id) {
+      if (ele.id === id) {
         updatedList.push({
-          val: ele.val,
-          check: !ele.check,
-          key: ele.key,
+          label: ele.label,
+          checked: !ele.checked,
+          id: ele.id,
         });
       } else {
         updatedList.push(ele);
@@ -31,6 +38,7 @@ export default function List({
     });
     setList(updatedList);
   };
+  // move to App.tsx
 
   const openEdit = () => {
     setEditVisible(true);
@@ -39,13 +47,13 @@ export default function List({
     setEditVisible(false);
   };
   const updateText = () => {
-    var updatedList: listItem[] = [];
+    var updatedList: ListItemType[] = [];
     list.map((ele) => {
-      if (ele.key === id) {
+      if (ele.id === id) {
         updatedList.push({
-          val: editInput,
-          check: ele.check,
-          key: ele.key,
+          label: editInput,
+          checked: ele.checked,
+          id: ele.id,
         });
       } else {
         updatedList.push(ele);
@@ -55,22 +63,10 @@ export default function List({
     setEditInput("");
     closeEdit();
   };
+  //change
+
   return (
-    <div>
-      <li className="listItem">
-        {editVisible ? <></> : <button onClick={openEdit}>Edit</button>}
-        <button
-          onClick={() => {
-            deleteItem(id);
-          }}
-        >
-          Delete
-        </button>
-        <label>{item.val}</label>
-
-        <input type="checkbox" checked={item.check} onClick={updateCheck} />
-      </li>
-
+    <li className="listItem">
       {editVisible ? (
         <div className="editTask">
           <input
@@ -84,9 +80,21 @@ export default function List({
           <button onClick={closeEdit}>Cancel</button>
         </div>
       ) : (
-        <></>
+        <>
+          {editVisible ? <></> : <button onClick={openEdit}>Edit</button>}
+          <button
+            onClick={() => {
+              onDeleteItem(id);
+            }}
+          >
+            Delete
+          </button>
+          <label>{item.label}</label>
+
+          <input type="checkbox" checked={item.checked} onClick={updateCheck} />
+        </>
       )}
-    </div>
+    </li>
   );
 }
 
